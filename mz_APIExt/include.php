@@ -61,6 +61,22 @@ function mz_APIExt_GetCateIDBy($cateName)
   }
   return $category->ID;
 }
+function mz_APIExt_IsApache($step = 1)
+{
+  $serve = strtolower($_SERVER["SERVER_SOFTWARE"]);
+  if (strpos($serve, 'apache') === false) {
+    return 0;
+  }
+  if ($step == 1) {
+    return 1;
+  }
+  $file = ZBP_PATH . '.htaccess';
+  $fileCon = file_get_contents($file);
+  if (strpos("$fileCon", "HTTP_AUTHORIZATION") === false) {
+    return 0;
+  }
+  return 1;
+}
 function InstallPlugin_mz_APIExt()
 {
   global $zbp;

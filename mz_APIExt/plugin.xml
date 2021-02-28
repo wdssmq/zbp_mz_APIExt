@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin version="php">
 <id>mz_APIExt</id>
-<name>API接口扩展</name>
+<name>API 接口扩展</name>
 <url>//jq.qq.com/?_wv=1027&amp;k=555hND5</url>
 <note>对API请求进行预定义处理</note>
 <description>置百丈玄冰而崩裂，掷须臾池水而漂摇。</description>
@@ -19,9 +19,9 @@
   <url></url>
 </source>
 <adapted>172820</adapted>
-<version>1.0.1</version>
+<version>1.0.2</version>
 <pubdate>2021-02-10</pubdate>
-<modified>2021-02-14</modified>
+<modified>2021-02-27</modified>
 <price>0</price>
 <phpver>5.4</phpver>
 <advanced>
