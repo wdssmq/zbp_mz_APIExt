@@ -7,6 +7,21 @@ function ActivePlugin_mz_APIExt()
     Add_Filter_Plugin('Filter_Plugin_Zbp_PreLoad', 'mz_APIExt_SetHooks');
   }
   Add_Filter_Plugin('Filter_Plugin_API_Begin', 'mz_APIExt_Main');
+  Add_Filter_Plugin('Filter_Plugin_API_Get_Object_Array', 'mz_APIExt_Get');
+}
+function mz_APIExt_Get($object, $array, &$other_props, $remove_props, $with_relations)
+{
+  global $zbp;
+  $postImgsOn = $zbp->Config('mz_APIExt')->postImgsOn;
+  if (!$postImgsOn) {
+    return;
+  }
+  global $mod, $act;
+  if ("post" !== $mod || !HasNameInString("list|get", $act)) {
+    return;
+  }
+  $other_props[] = "AllImages";
+  $other_props[] = "ImageCount";
 }
 // 移除冲突的接口
 function mz_APIExt_SetHooks()

@@ -22,6 +22,7 @@ if ($act == 'save') {
     }
     switch ($key) {
       case 'createCateOn':
+      case 'postImgsOn':
         $val = boolval($val);
         break;
       default:
@@ -44,6 +45,8 @@ require $blogpath . 'zb_system/admin/admin_top.php';
 <div id="divMain">
   <div class="divHeader"><?php echo $blogtitle; ?></div>
   <div class="SubMenu">
+    <a href="main.php" title="首页"><span class="m-left m-now">首页</span></a>
+    <?php require "about.php"; ?>
   </div>
   <div id="divMain2">
     <form action="<?php echo BuildSafeURL("main.php?act=save"); ?>" method="post">
@@ -56,6 +59,11 @@ require $blogpath . 'zb_system/admin/admin_top.php';
         <tr>
           <td>自动创建分类</td>
           <td><?php zbpform::zbradio("createCateOn", $zbp->Config("mz_APIExt")->createCateOn); ?></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>输出文章缩略图</td>
+          <td><?php zbpform::zbradio("postImgsOn", $zbp->Config("mz_APIExt")->postImgsOn); ?></td>
           <td></td>
         </tr>
         <tr>
