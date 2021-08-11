@@ -62,6 +62,11 @@ require $blogpath . 'zb_system/admin/admin_top.php';
           <td></td>
         </tr>
         <tr>
+          <td>自动文章别名</td>
+          <td><?php zbpform::zbradio("genAliasOn", $zbp->Config("mz_APIExt")->genAliasOn); ?></td>
+          <td>20210811XXX 日期 + 三位数</td>
+        </tr>
+        <tr>
           <td>输出文章缩略图</td>
           <td><?php zbpform::zbradio("postImgsOn", $zbp->Config("mz_APIExt")->postImgsOn); ?></td>
           <td></td>

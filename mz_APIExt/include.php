@@ -42,17 +42,22 @@ function mz_APIExt_Editormd(&$article)
   $article->Metas->md_content = $md_content;
   if (stripos($md_content, '<!--more-->') !== false) {
     $md_intro = GetValueInArray(explode('<!--more-->', $md_content), 0);
+    $article->Metas->md_intro   = $md_intro;
   }
-  $article->Metas->md_intro   = $md_intro;
 }
 function mz_APIExt_Main()
 {
-  // Logs_Dump($_GET, $_POST);
+  // 使用 CateName 获取 ID；
   $cateName = GetVars("CateName", "POST");
   if (!empty($cateName)) {
-    ApiCheckAuth(true, 'CategoryPst');
     $cateID = mz_APIExt_GetCateIDBy(trim($cateName));
     $_POST['CateID'] = $cateID;
+  }
+  // 生成别名
+  $alias = GetVars('Alias', 'POST');
+  $id = GetVars('ID', 'POST');
+  if (mz_APIExt_GenAlias($alias, $id)) {
+    $_POST['Alias'] = $alias;
   }
 }
 function mz_APIExt_GetCateIDBy($cateName)
@@ -71,10 +76,31 @@ function mz_APIExt_GetCateIDBy($cateName)
     }
   }
   if ($createCateOn && $category->ID == 0) {
+    ApiCheckAuth(true, 'CategoryPst');
     $category->Name = $cateName;
     $category->Save();
   }
   return $category->ID;
+}
+function mz_APIExt_GenAlias(&$alias, $id)
+{
+  global $zbp;
+  $genAliasOn = $zbp->Config('mz_APIExt')->genAliasOn;
+  if (!$genAliasOn || !empty($alias)) {
+    return false;
+  }
+  if (0 !== $id) {
+    $article = $zbp->GetPostByID($id);
+    if (!empty($article->Alias)) {
+      $alias = $article->Alias;
+      return true;
+    }
+  }
+  $alias = date("Ymd");
+  CountNormalArticleNums();
+  $mod = $zbp->cache->normal_article_nums % 999;
+  $alias .= str_pad($mod, 3, "0", STR_PAD_LEFT);
+  return true;
 }
 function mz_APIExt_IsApache($step = 1)
 {
