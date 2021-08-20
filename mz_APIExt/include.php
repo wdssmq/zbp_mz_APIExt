@@ -98,7 +98,7 @@ function mz_APIExt_GenAlias(&$alias, $id)
   }
   $alias = date("Ymd");
   CountNormalArticleNums();
-  $mod = $zbp->cache->normal_article_nums % 999;
+  $mod = ($zbp->cache->normal_article_nums + $id) % 999;
   $alias .= str_pad($mod, 3, "0", STR_PAD_LEFT);
   return true;
 }
