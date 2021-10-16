@@ -10,7 +10,7 @@ $(function () {
   }
   fnToggleTab();
   $(".content-box-tabs a").click(function () {
-    //alert(this.href);
+    // alert(this.href);
     window.history.pushState(null, null, this.href.replace(/#tab1/, ""));
   });
   // readOnly
@@ -21,8 +21,9 @@ $(function () {
       $el.data("val", $el.val());
     }
     $el.focus();
-    $el.select();
+    // $el.select();
   };
+  // 因为是在 zblog 里选项器用的相邻
   $(".focus + *").mouseenter(function (i) {
     $(this).focus();
   });
@@ -33,14 +34,22 @@ $(function () {
       $el.attr("placeholder", str);
     }
   });
-  // 因为是在zblog里选项器用的相邻
+  $(".auto-select").each(function (i) {
+    const $next = $(this).next("*");
+    $next.addClass("auto-select");
+  });
   $(".readonly + *")
     .click(function () {
       const _this = this;
       setTimeout(function () {
-        _this.select();
+        if (_this.hasClass("auto-select")) {
+          _this.select();
+        }
       }, 150);
       fnReCover($(this));
+    })
+    .dblclick(function () {
+      $(this).select();
     })
     .mouseenter(function () {
       fnReCover($(this));
