@@ -41,12 +41,12 @@ $(function () {
   $(".readonly + *")
     .click(function () {
       const _this = this;
+      fnReCover($(this));
       setTimeout(function () {
-        if (_this.hasClass("auto-select")) {
-          _this.select();
+        if ($(_this).hasClass("auto-select")) {
+          $(_this).select();
         }
       }, 150);
-      fnReCover($(this));
     })
     .dblclick(function () {
       $(this).select();
@@ -60,5 +60,5 @@ $(function () {
     .change(function () {
       fnReCover($(this));
     })
-    .attr("readonly", 1);
+    // .attr("readonly", 1);
 });
