@@ -25,6 +25,10 @@ if ($act == 'save') {
       case 'postImgsOn':
         $val = boolval($val);
         break;
+      case 'outMetas':
+        $val = preg_replace('/[^a-zA-Z0-9_]+/', ',', $val);
+        $val = explode(',', $val);
+        break;
       default:
         $val = trim($val);
         break;
@@ -37,7 +41,9 @@ if ($act == 'save') {
   Redirect('./main.php' . ($suc == null ? '' : "?act={$suc}"));
 }
 
-$blogtitle = 'API接口扩展';
+InstallPlugin_mz_APIExt();
+
+$blogtitle = 'API 接口扩展';
 require $blogpath . 'zb_system/admin/admin_header.php';
 require $blogpath . 'zb_system/admin/admin_top.php';
 ?>
@@ -52,14 +58,14 @@ require $blogpath . 'zb_system/admin/admin_top.php';
     <form action="<?php echo BuildSafeURL("main.php?act=save"); ?>" method="post">
       <table width="100%" class="tableBorder">
         <tr>
-          <th width="10%">项目</th>
+          <th width="13%">项目</th>
           <th>内容</th>
           <th width="45%">说明</th>
         </tr>
         <tr>
           <td>自动创建分类</td>
           <td><?php zbpform::zbradio("createCateOn", $zbp->Config("mz_APIExt")->createCateOn); ?></td>
-          <td></td>
+          <td>API 发布文章时支持使用 CateName 指定分类；<br>不存在对应分类时，开启本选项后将自动创建；</td>
         </tr>
         <tr>
           <td>自动文章别名</td>
@@ -71,6 +77,10 @@ require $blogpath . 'zb_system/admin/admin_top.php';
           <td><?php zbpform::zbradio("postImgsOn", $zbp->Config("mz_APIExt")->postImgsOn); ?></td>
           <td></td>
         </tr>
+        <tr>
+          <td>输出 Meta 字段</td>
+          <td><?php zbpform::text("outMetas", implode(",", $zbp->Config("mz_APIExt")->outMetas), "79%"); ?></td>
+          <td>英文逗号分隔</td>
         <tr>
           <td></td>
           <td colspan="2"><input type="submit" value="提交" /></td>
