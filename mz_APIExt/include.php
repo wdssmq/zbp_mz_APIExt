@@ -45,10 +45,11 @@ function mz_APIExt_Editormd(&$article)
   if (empty($md_content)) {
     return;
   }
-  $md_content = str_replace("<!--more-->", "<!-- more -->", $md_content);
+  // Z-BlogPHP 系统内是不带空格的 <!--more-->
+  $md_content = str_replace("<!-- more -->", "<!--more-->", $md_content);
   $article->Metas->md_content = $md_content;
-  if (stripos($md_content, '<!-- more -->') !== false) {
-    $md_intro = GetValueInArray(explode('<!-- more -->', $md_content), 0);
+  if (stripos($md_content, '<!--more-->') !== false) {
+    $md_intro = GetValueInArray(explode('<!--more-->', $md_content), 0);
     $article->Metas->md_intro   = $md_intro;
   }
 }
