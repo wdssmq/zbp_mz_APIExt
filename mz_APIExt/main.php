@@ -117,6 +117,7 @@ require $blogpath . 'zb_system/admin/admin_top.php';
         <td>
           <p><i class="placeholder" data-placeholder="密码"></i><?php zbpform::password('read_pwd', '', "87%"); ?> 密码</p>
           <p><i class="readonly placeholder" data-placeholder="MD5"></i><?php zbpform::text('read_md5', '', "87%"); ?>MD5</p>
+          <p><i class="placeholder" data-placeholder="有效期"></i><?php zbpform::text('read_savedate', '30', "87%"); ?> 有效期</p>
         </td>
         <td><button type="button" class="js-api-test">测试</button> <span class="js-api-msg"></span></td>
       </tr>
