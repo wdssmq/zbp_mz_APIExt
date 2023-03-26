@@ -1,3 +1,5 @@
+/* global MD5:false */
+
 $(function () {
   $("#read_pwd").change(function () {
     const pwd = $(this).val();
@@ -24,7 +26,7 @@ $(function () {
         lsObj.data = JSON.parse(data);
       }
     },
-  }
+  };
   lsObj.load();
 
   $("#read_savedate").val(lsObj.get("read_savedate", 30));
@@ -51,7 +53,7 @@ $(function () {
   async function fnAPI(
     api = { mod: "post", act: "get" },
     data = {},
-    cb = () => { }
+    cb = () => { },
   ) {
     const urlBase = bloghost + "zb_system/api.php";
     const url = `${urlBase}?mod=${api.mod}&act=${api.act}`;
@@ -93,7 +95,7 @@ $(function () {
       return {
         username: $(".username span").text().replace("管理员：", "").trim(),
         password: $("#read_md5").val(),
-        savedate: savedate
+        savedate: savedate,
       };
     })();
     fnAPI({ mod: "member", act: "login" }, arg_data, function (res) {
