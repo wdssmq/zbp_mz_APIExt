@@ -13,10 +13,15 @@ function ActivePlugin_mz_APIExt()
 function mz_APIExt_Get($object, &$array, &$other_props, $remove_props, $with_relations)
 {
   global $zbp;
-  global $mod, $act;
-  if ("post" !== $mod || !HasNameInString("list|get", $act)) {
+  // global $mod, $act;
+
+  // 获取分类名称
+  $className = get_class($object);
+  // 仅针对 Post 对象
+  if ("Post" != $className) {
     return;
   }
+
   $postImgsOn = $zbp->Config('mz_APIExt')->postImgsOn;
   $outMetas = $zbp->Config("mz_APIExt")->outMetas;
   if ($postImgsOn) {
