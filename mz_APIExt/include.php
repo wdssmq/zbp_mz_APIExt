@@ -1,15 +1,44 @@
 <?php
-#注册插件
 RegisterPlugin("mz_APIExt", "ActivePlugin_mz_APIExt");
+
 function ActivePlugin_mz_APIExt()
 {
   if (defined('ZBP_IN_API') && ZBP_IN_API) {
     Add_Filter_Plugin('Filter_Plugin_Zbp_PreLoad', 'mz_APIExt_SetHooks');
   }
-  Add_Filter_Plugin('Filter_Plugin_API_Begin', 'mz_APIExt_Main');
+  Add_Filter_Plugin('Filter_Plugin_API_Dispatch', 'mz_APIExt_Post');
   Add_Filter_Plugin('Filter_Plugin_API_Get_Object_Array', 'mz_APIExt_Get');
 }
-// API 接口输出自定义
+
+// 接口函数定义：接口挂载调整
+function mz_APIExt_SetHooks()
+{
+  global $zbp;
+  Remove_Filter_Plugin("Filter_Plugin_PostArticle_Core", "PostData_Editormd");
+  if ($zbp->CheckPlugin('Editormd')) {
+    Add_Filter_Plugin('Filter_Plugin_PostArticle_Core', 'mz_APIExt_Editormd');
+  }
+}
+
+// 接口函数定义：发布接口前置处理
+function mz_APIExt_Post($mods, $mod, $act)
+{
+  // 使用 CateName 获取 ID；
+  $cateName = GetVars("CateName", "POST");
+  if (!empty($cateName)) {
+    $cateID = mz_APIExt_GetCateIDBy(trim($cateName));
+    $_POST['CateID'] = $cateID;
+  }
+
+  // 生成别名
+  $alias = GetVars('Alias', 'POST');
+  $id = GetVars('ID', 'POST');
+  if (mz_APIExt_GenAlias($alias, $id)) {
+    $_POST['Alias'] = $alias;
+  }
+}
+
+// 接口函数定义：API 接口输出自定义
 function mz_APIExt_Get($object, &$array, &$other_props, $remove_props, $with_relations)
 {
   global $zbp;
@@ -34,15 +63,8 @@ function mz_APIExt_Get($object, &$array, &$other_props, $remove_props, $with_rel
     }
   }
 }
-// 移除冲突的接口
-function mz_APIExt_SetHooks()
-{
-  global $zbp;
-  Remove_Filter_Plugin("Filter_Plugin_PostArticle_Core", "PostData_Editormd");
-  if ($zbp->CheckPlugin('Editormd')) {
-    Add_Filter_Plugin('Filter_Plugin_PostArticle_Core', 'mz_APIExt_Editormd');
-  }
-}
+
+// 接口函数定义：为 Editormd 插件写入数据
 function mz_APIExt_Editormd(&$article)
 {
 
@@ -58,21 +80,46 @@ function mz_APIExt_Editormd(&$article)
     $article->Metas->md_intro   = $md_intro;
   }
 }
-function mz_APIExt_Main()
+
+// ----------------------------------------
+
+function InstallPlugin_mz_APIExt()
 {
-  // 使用 CateName 获取 ID；
-  $cateName = GetVars("CateName", "POST");
-  if (!empty($cateName)) {
-    $cateID = mz_APIExt_GetCateIDBy(trim($cateName));
-    $_POST['CateID'] = $cateID;
+  global $zbp;
+  if (!$zbp->HasConfig('mz_APIExt')) {
+    $zbp->Config('mz_APIExt')->version = 1;
+    $zbp->Config('mz_APIExt')->createCateOn = false;
+    $zbp->Config('mz_APIExt')->genAliasOn = false;
+    $zbp->Config('mz_APIExt')->postImgsOn = false;
+    $zbp->Config('mz_APIExt')->outMetas = array();
+    $zbp->SaveConfig('mz_APIExt');
   }
-  // 生成别名
-  $alias = GetVars('Alias', 'POST');
-  $id = GetVars('ID', 'POST');
-  if (mz_APIExt_GenAlias($alias, $id)) {
-    $_POST['Alias'] = $alias;
+  UpdatePlugin_mz_APIExt();
+}
+
+// 插件升级时执行
+function UpdatePlugin_mz_APIExt()
+{
+  global $zbp;
+  // 2022-03-10
+  if (!$zbp->Config('mz_APIExt')->HasKey("outMetas")) {
+    $zbp->Config('mz_APIExt')->outMetas = array();
+    $zbp->SaveConfig('mz_APIExt');
   }
 }
+
+// 旧版兼容
+function mz_APIExt_Updated()
+{
+  UpdatePlugin_mz_APIExt();
+}
+
+function UninstallPlugin_mz_APIExt()
+{
+}
+
+// ----------------------------------------
+
 function mz_APIExt_GetCateIDBy($cateName)
 {
   global $zbp;
@@ -95,6 +142,7 @@ function mz_APIExt_GetCateIDBy($cateName)
   }
   return $category->ID;
 }
+
 function mz_APIExt_GenAlias(&$alias, $id)
 {
   global $zbp;
@@ -115,6 +163,7 @@ function mz_APIExt_GenAlias(&$alias, $id)
   $alias .= str_pad($mod, 3, "0", STR_PAD_LEFT);
   return true;
 }
+
 function mz_APIExt_IsApache($step = 1)
 {
   $serve = strtolower($_SERVER["SERVER_SOFTWARE"]);
@@ -130,35 +179,4 @@ function mz_APIExt_IsApache($step = 1)
     return 0;
   }
   return 1;
-}
-function InstallPlugin_mz_APIExt()
-{
-  global $zbp;
-  if (!$zbp->HasConfig('mz_APIExt')) {
-    $zbp->Config('mz_APIExt')->version = 1;
-    $zbp->Config('mz_APIExt')->createCateOn = false;
-    $zbp->Config('mz_APIExt')->genAliasOn = false;
-    $zbp->Config('mz_APIExt')->postImgsOn = false;
-    $zbp->Config('mz_APIExt')->outMetas = array();
-    $zbp->SaveConfig('mz_APIExt');
-  }
-  UpdatePlugin_mz_APIExt();
-}
-// 插件升级时执行
-function UpdatePlugin_mz_APIExt()
-{
-  global $zbp;
-  // 2022-03-10
-  if (!$zbp->Config('mz_APIExt')->HasKey("outMetas")) {
-    $zbp->Config('mz_APIExt')->outMetas = array();
-    $zbp->SaveConfig('mz_APIExt');
-  }
-}
-// 旧版兼容
-function mz_APIExt_Updated()
-{
-  UpdatePlugin_mz_APIExt();
-}
-function UninstallPlugin_mz_APIExt()
-{
 }
