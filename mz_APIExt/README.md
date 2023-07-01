@@ -24,6 +24,8 @@ https://github.com/wdssmq/Markdown-To-Z-Blog
 
 ## 更新记录
 
+2023-07-01：允许 API 使用不存在的文章 ID 入库；
+
 2023-06-21：修复文章返回额外字段的接口；
 
 2022-09-10：生成 token 的有效期设置；

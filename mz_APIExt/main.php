@@ -22,6 +22,7 @@ if ($act == 'save') {
     }
     switch ($key) {
       case 'createCateOn':
+      case 'createPostOn':
       case 'postImgsOn':
         $val = boolval($val);
         break;
@@ -64,13 +65,18 @@ require $blogpath . 'zb_system/admin/admin_top.php';
         </tr>
         <tr>
           <td>自动创建分类</td>
-          <td><?php zbpform::zbradio("createCateOn", $zbp->Config("mz_APIExt")->createCateOn); ?></td>
+          <td><?php zbpform::zbradio("createCateOn", $zbp->Config("mz_APIExt")->createCateOn); ?>注：不影响分类自身的 API 接口</td>
           <td>API 发布文章时支持使用 CateName 指定分类；<br>不存在对应分类时，开启本选项后将自动创建；</td>
         </tr>
         <tr>
           <td>自动文章别名</td>
           <td><?php zbpform::zbradio("genAliasOn", $zbp->Config("mz_APIExt")->genAliasOn); ?></td>
-          <td>20210811XXX 日期 + 三位数</td>
+          <td>20210811XXX 日期 + 三位数；</td>
+        </tr>
+        <tr>
+          <td>指定 ID 入库</td>
+          <td><?php zbpform::zbradio("createPostOn", $zbp->Config("mz_APIExt")->createPostOn); ?></td>
+          <td>文章发布请求指定了 ID，但不存在相应记录时由本插件先行创建；</td>
         </tr>
         <tr>
           <td>输出文章缩略图</td>

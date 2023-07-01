@@ -23,6 +23,15 @@ function mz_APIExt_SetHooks()
 // 接口函数定义：发布接口前置处理
 function mz_APIExt_Post($mods, $mod, $act)
 {
+
+  if ("post" != $mod || "post" != $act) {
+    return;
+  }
+
+  // // 记录日志
+  // Logs_Dump($mods, $mod, $act);
+  // Logs("--------------");
+
   // 使用 CateName 获取 ID；
   $cateName = GetVars("CateName", "POST");
   if (!empty($cateName)) {
@@ -35,6 +44,12 @@ function mz_APIExt_Post($mods, $mod, $act)
   $id = GetVars('ID', 'POST');
   if (mz_APIExt_GenAlias($alias, $id)) {
     $_POST['Alias'] = $alias;
+  }
+
+  // 指定 ID 不为 0 时，进行检查及相应处理
+  $id = GetVars('ID', 'POST');
+  if ($id != 0) {
+    mz_APIExt_CheckPost($id);
   }
 }
 
@@ -120,11 +135,12 @@ function UninstallPlugin_mz_APIExt()
 
 // ----------------------------------------
 
+// 分类获取函数
 function mz_APIExt_GetCateIDBy($cateName)
 {
   global $zbp;
+  // 通过分类名称获取分类 ID
   $category = $zbp->GetCategoryByName($cateName);
-  $createCateOn = $zbp->Config('mz_APIExt')->createCateOn;
   // 对于命名为“未分类”的文章，使用 ID 最小的一级分类
   if ($cateName == "未分类" && $category->ID == 0) {
     ksort($zbp->categories_all);
@@ -135,6 +151,8 @@ function mz_APIExt_GetCateIDBy($cateName)
       }
     }
   }
+  // 如果分类不存在，且开启了自动创建分类，则创建分类
+  $createCateOn = $zbp->Config('mz_APIExt')->createCateOn;
   if ($createCateOn && $category->ID == 0) {
     ApiCheckAuth(true, 'CategoryPst');
     $category->Name = $cateName;
@@ -143,6 +161,7 @@ function mz_APIExt_GetCateIDBy($cateName)
   return $category->ID;
 }
 
+// 别名生成函数
 function mz_APIExt_GenAlias(&$alias, $id)
 {
   global $zbp;
@@ -164,6 +183,42 @@ function mz_APIExt_GenAlias(&$alias, $id)
   return true;
 }
 
+// 检查文章是否存在
+function mz_APIExt_CheckPost($id)
+{
+  global $zbp;
+  $article = $zbp->GetPostByID($id);
+  $createPostOn = $zbp->Config('mz_APIExt')->createPostOn;
+  // 如果文章不存在，且开启了自动创建文章，则创建文章
+  if ($article->ID == 0 && $createPostOn) {
+    mz_APIExt_CreateNewData('Post', $id);
+  }
+}
+
+// 直接创建指定 ID 的数据
+function mz_APIExt_CreateNewData($table, $id)
+{
+  global $zbp;
+  $fieldID = $zbp->datainfo[$table]['ID'][0];
+  $data = array(
+    $fieldID => $id
+  );
+  foreach ($zbp->datainfo[$table] as $key => $value) {
+    if ($key == 'ID') {
+      continue;
+    }
+    $f = $value[0];
+    if ($value[1] == 'boolean') {
+      $data[$f] = 0;
+    } else {
+      $data[$f] = $value[3];
+    }
+  }
+  $sql = $zbp->db->sql->Insert($zbp->table[$table], $data);
+  $zbp->db->Insert($sql);
+}
+
+// 判断是否为 Apache 服务器
 function mz_APIExt_IsApache($step = 1)
 {
   $serve = strtolower($_SERVER["SERVER_SOFTWARE"]);
