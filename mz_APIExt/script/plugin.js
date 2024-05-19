@@ -1,7 +1,7 @@
 /* global MD5:false */
 
-$(function () {
-  $("#read_pwd").change(function () {
+$(function() {
+  $("#read_pwd").change(function() {
     const pwd = $(this).val();
     $("#read_md5").val(MD5(pwd));
   });
@@ -79,7 +79,7 @@ $(function () {
       });
   }
 
-  $(".js-api-test").click(function () {
+  $(".js-api-test").click(function() {
     const arg_data = (() => {
       let savedate = parseInt($("#read_savedate").val());
       // 判断是否为数字
@@ -98,7 +98,7 @@ $(function () {
         savedate: savedate,
       };
     })();
-    fnAPI({ mod: "member", act: "login" }, arg_data, function (res) {
+    fnAPI({ mod: "member", act: "login" }, arg_data, function(res) {
       $(".js-api-msg").text(`${res.message}，也可直接在控制台查看 Token 使用`);
     });
   });
